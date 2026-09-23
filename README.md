@@ -18,12 +18,12 @@ GET http://localhost:5242/api/stories/best?n=10
 
 - `beststories.json` returns story ids already sorted by score in descending order, as verified by inspecting its live contents. The API takes advantage of this and avoids re-sorting on every request.
 - The contents of `beststories.json` can change at any time, so the only way to stay current is to poll it periodically rather than fetch it once and cache indefinitely.
-- Real-time accuracy is not required for this data. Serving slightly stale results, for example up to a couple of minutes old, is an acceptable trade-off for reducing load on the Hacker News API.
+- Real-time accuracy is not required for this data. Serving slightly stale results, for example up to 30 seconds, is an acceptable trade-off for reducing load on the Hacker News API.
+- The background refresh interval is configured to 30 seconds by default. This value is configurable, so it can be lowered if closer-to-real-time data is needed, or raised to further reduce load on the Hacker News API.
 - If the caller requests more stories than are currently available, the API returns all available stories instead of treating it as an error.
 - Caching is implemented in-memory for simplicity. In a real-world deployment with multiple API instances, a distributed cache such as Redis would be used instead, so all instances share the same cached data rather than each maintaining its own.
 - If a call to the Hacker News best stories or item endpoints fails, the previously cached data is assumed to still be valid and is served as a fallback rather than failing the request.
 - Consumers of the API are assumed to be interested in a limited number of popular stories, for example the top 100. For that reason the amount of story data kept in the cache is capped by a configurable maximum, since requesting more than that is not expected to be the common case. If a request asks for more stories than are cached, the missing ones are retrieved live from the Hacker News API and merged into the response.
-- The background refresh interval is configured to 30 seconds by default. This value is configurable, so it can be lowered if closer-to-real-time data is needed, or raised to further reduce load on the Hacker News API.
 
 ## Enhancements Given More Time
 
